@@ -64,13 +64,15 @@ NoLeak is an offline-first encrypted vault built with Flutter and native Android
 - All crypto via [libsodium](https://libsodium.org/)
 
 ### 🛡️ Security Layers
-- Root/Magisk detection
+- Root/Magisk detection (fail-closed)
 - Emulator and debugger detection
 - Frida/Xposed hooking detection
 - Screenshot prevention (FLAG_SECURE)
 - Biometric authentication required for vault unlock
 - Progressive brute-force lockout (30s → 1hr)
-- Secure memory handling (mlock + zeroization)
+- Secure memory handling (zeroization with random overwrite)
+- Custom secure keyboard (bypasses system IME)
+- No internet permission (explicitly removed)
 
 ### 📁 File Management
 - Import files and entire folders
@@ -116,10 +118,10 @@ Passphrase
 
 | Component | Algorithm | Notes |
 |:----------|:----------|:------|
-| Symmetric Encryption | XChaCha20-Poly1305 | 256-bit key, 192-bit nonce, AEAD |
-| Key Derivation | Argon2id | Memory-hard, side-channel resistant |
-| Random Generation | libsodium randombytes | CSPRNG |
-| Hashing | SHA-256 | Legacy container hash (best-effort, not required to unlock) |
+| Symmetric Encryption | XChaCha20-Poly1305 | 256-bit key, 192-bit nonce (prevents nonce reuse), AEAD |
+| Key Derivation | Argon2id | Memory-hard, GPU/ASIC resistant, side-channel resistant |
+| Random Generation | libsodium randombytes | CSPRNG backed by OS entropy |
+| Hashing | SHA-256 | Container integrity (best-effort, not required for unlock) |
 
 ### Adaptive KDF Parameters
 
@@ -144,8 +146,9 @@ The app performs these checks before allowing vault operations:
 - Bootloader lock state
 - APK signature verification
 - Test-keys build detection
+- Install source verification (blocks sideloading via adb shell)
 
-If any check fails, vault operations are blocked.
+If any check fails, vault operations are blocked (fail-closed design).
 
 ### Session Security
 
@@ -153,6 +156,22 @@ If any check fails, vault operations are blocked.
 - Session limit: 3-10 minutes (configurable)
 - Auto-lock on app background
 - Timers pause during file operations to prevent data loss
+
+### Memory Security
+
+- Sensitive data (keys, passphrases) overwritten with random bytes before zeroing
+- Native memory handling via libsodium's `sodium_memzero()`
+- JNI passphrase buffers zeroized after use
+- Secure file wipe before deletion (random overwrite + zero + fsync)
+
+### Platform Hardening
+
+- `FLAG_SECURE` prevents screenshots and screen recording
+- `INTERNET` permission explicitly removed in manifest
+- Cloud backup and device transfer disabled via `data_extraction_rules.xml`
+- Vault registry metadata encrypted with Android Keystore (AES-256-GCM)
+- Custom on-screen keyboard bypasses system IME to prevent keylogger attacks
+- Logging disabled in release builds (both Kotlin and native C)
 
 ## Architecture
 
@@ -225,6 +244,8 @@ noleak/
 
 ### Vault File Format
 
+The vault uses a journaled header format with A/B slots for crash safety during header writes.
+
 ```
 ┌──────────────────────────────────────┐
 │ Journal Header (A/B)                 │
@@ -241,10 +262,13 @@ noleak/
 │ Encrypted Data Blobs                 │
 │  - Per-file: nonce + ciphertext      │
 │  - Chunks (legacy 1MB, stream 4MB)   │
+│  - AAD includes chunk_index          │
 ├──────────────────────────────────────┤
 │ Integrity Hash (SHA-256)             │
 └──────────────────────────────────────┘
 ```
+
+**Note:** The SHA-256 hash is a legacy integrity check (best-effort). Security is enforced by AEAD authentication on all encrypted sections—tampering with any encrypted data will fail decryption.
 
 
 ## Building from Source
