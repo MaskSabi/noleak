@@ -1,0 +1,5 @@
+# Copy to android/key.properties (do not commit) or set NOLEAK_* env vars.
+storeFile=app/your-release-key.jks
+storePassword=
+keyAlias=
+keyPassword=

@@ -303,6 +303,35 @@ flutter build apk --release
 
 Output: `build/app/outputs/flutter-apk/app-release.apk`
 
+### Release Signing Setup
+
+Release builds require a signing key. Use a local `key.properties` (do not commit) or environment variables.
+
+Option A: `key.properties` (local only)
+1. Copy `android/key.properties.example` to `android/key.properties`
+2. Fill in `storeFile`, `storePassword`, `keyAlias`, and `keyPassword`
+
+Option B: Environment variables
+- `NOLEAK_STORE_FILE`
+- `NOLEAK_STORE_PASSWORD`
+- `NOLEAK_KEY_ALIAS`
+- `NOLEAK_KEY_PASSWORD`
+
+Generate a keystore (CLI example)
+```bash
+keytool -genkeypair -v \
+  -keystore android/app/your-release-key.jks \
+  -alias noleak \
+  -keyalg RSA -keysize 2048 -validity 36500 \
+  -storepass "YOUR_STORE_PASS" \
+  -keypass "YOUR_KEY_PASS" \
+  -dname "CN=NoLeak, OU=Dev, O=NoLeak, L=Washington, S=WA, C=US"
+```
+
+Android Studio alternative: Build > Generate Signed Bundle/APK, then point to the `.jks`.
+
+Keep the `.jks` file and passwords out of source control. Rotate the key if it was ever exposed.
+
 ## Contributing
 
 ### Guidelines
